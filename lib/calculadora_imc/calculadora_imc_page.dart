@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'calculadora_imc_model.dart';
+import 'calculadora_imc_repository.dart';
 
 class CalculadoraImc extends StatefulWidget {
   const CalculadoraImc({super.key, required this.title});
@@ -12,10 +13,25 @@ class CalculadoraImc extends StatefulWidget {
 }
 
 class _CalculadoraImcState extends State<CalculadoraImc> {
+  late CalculadoraImcRepository calculadoraImcRepository;
   List<CalculadoraImcModel> calculadoraImc = [];
+
   final _idadeController = TextEditingController();
   final _alturaController = TextEditingController();
   final _pesoController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    this.getData();
+  }
+
+   void getData() async {
+    calculadoraImcRepository = await CalculadoraImcRepository.carregar();
+    calculadoraImc = calculadoraImcRepository.index();
+    setState(() {});
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +46,7 @@ class _CalculadoraImcState extends State<CalculadoraImc> {
           return ListTile(
             title: Text(calculadoraImc[index].getIMC()), 
             subtitle: Text('Idade: ${calculadoraImc[index].idade} Altura: ${calculadoraImc[index].altura} Peso: ${calculadoraImc[index].peso}'),
-            leading: Icon(Icons.fitness_center), 
+            leading: const Icon(Icons.fitness_center), 
           );
         },
       ),
@@ -42,13 +58,13 @@ class _CalculadoraImcState extends State<CalculadoraImc> {
             _pesoController.text = '';
 
             return AlertDialog(
-              title: Text('Cálculo de IMC'),
+              title: const Text('Cálculo de IMC'),
               content: SingleChildScrollView(
                 child: Column(
                   children: [
                     TextField(
                       controller: _idadeController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Idade',
                         hintText: 'Digite sua idade',
                       ),
@@ -56,7 +72,7 @@ class _CalculadoraImcState extends State<CalculadoraImc> {
                     ),
                     TextField(
                       controller: _alturaController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Altura',
                         hintText: 'Digite sua altura',
                       ),
@@ -64,7 +80,7 @@ class _CalculadoraImcState extends State<CalculadoraImc> {
                     ),
                                         TextField(
                       controller: _pesoController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Peso',
                         hintText: 'Digite seu peso',
                       ),
@@ -78,7 +94,7 @@ class _CalculadoraImcState extends State<CalculadoraImc> {
                   onPressed: () {
                     Navigator.of(context).pop(); // Fecha o modal
                   },
-                  child: Text('Cancelar'),
+                  child: const Text('Cancelar'),
                 ),
                 TextButton(
                   onPressed: () {
@@ -92,12 +108,17 @@ class _CalculadoraImcState extends State<CalculadoraImc> {
                     }
 
                     setState(() {
-                      calculadoraImc.add(new CalculadoraImcModel(int.parse(idade), double.parse(altura), double.parse(peso)));
+                      CalculadoraImcModel imc = new CalculadoraImcModel();
+                      imc.idade = int.parse(idade);
+                      imc.altura = double.parse(altura);
+                      imc.peso = double.parse(peso);
+                      calculadoraImc.add(imc);
+                      calculadoraImcRepository.create(imc);
                     });
 
                     Navigator.of(context).pop();
                   },
-                  child: Text('Salvar IMC'),
+                  child: const Text('Salvar IMC'),
                 ),
               ]
             );

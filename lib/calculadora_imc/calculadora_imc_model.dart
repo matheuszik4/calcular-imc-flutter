@@ -1,14 +1,22 @@
+import 'package:hive/hive.dart';
 
+part 'calculadora_imc_model.g.dart';
 
-class CalculadoraImcModel {
-  CalculadoraImcModel(this.idade, this.altura, this.peso);
-  int idade;
-  double altura;
-  double peso;
+@HiveType(typeId: 1)
+class CalculadoraImcModel extends HiveObject {
+
+  @HiveField(0)
+  int idade = 0;
+
+  @HiveField(1)
+  double altura = 0.0;
+
+  @HiveField(2)
+  double peso = 0.0;
 
   String getIMC() {
     
-    double imc = this.peso / (this.altura*2); 
+    double imc = peso / (altura*2); 
 
     if (imc <= 16) {
       return 'Magreza Grave';
@@ -30,4 +38,5 @@ class CalculadoraImcModel {
 
     return '';
   }
+
 }
